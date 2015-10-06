@@ -44,14 +44,16 @@ def compute_error(kernel, X, y, a, n, k):
     return np.dot(ay, Kjk) - y[k]
 
 
-def compute_bi(kernel, X, y, a, i):
+def compute_bias(kernel, X, y, a):
     ay = compute_ay(a, y)
-    Kji = kernel_func(kernel, X, X[i, :])
-    return y[i] - np.dot(ay, Kji)  # using Eq. (21.33)
+    Kji = kernel_func(kernel, X, X.T)
+    bi_vec = y - np.dot(ay, Kji)  # using Eq. (21.33)
+    return np.average(bi_vec)
 
 
-def compute_weight(X, y, a, i):
-    return a[i] * y[i] * X[i]
+def compute_weight(X, y, a):
+    ay = compute_ay(a, y)
+    return np.dot(ay, X)
 
 
 def predict(a, indexes, kernel, X, y, b, z):
@@ -134,20 +136,15 @@ if __name__ == "__main__":
     aiyi = compute_ay(ai, yi)
     print "aiyi.shape: {0}".format(aiyi.shape)
 
-    # # Compute bias
-    # bi_vec = [compute_bi(kernel, X, y, a, i) for i in indexes]
-    # bias = sum(bi_vec) / len(bi_vec)
+    # Compute bias
+    bias = compute_bias(kernel, Xi, yi, ai)
+    print "bias: {0}".format(bias)
 
-    # # Compute w if linear kernel
-    # if kernel == "linear":
-    #     weights = [compute_weight(X, y, a, i) for i in indexes]
-    #     d = X.shape[1]
-    #     weight = np.zeros(d)
-    #     for w in weights:
-    #         for i in xrange(d):
-    #             weight[i] += w[i]
-    #
-    #
+    # Compute w if linear kernel
+    if kernel == "linear":
+        weight = compute_weight(Xi, yi, ai)
+        print "weight: {0}".format(weight)
+
     # # Compute accuracy
     # pred = [predict(a, indexes, kernel, X, y, bias, X[i]) for i in xrange(n)]
     # count = 0
