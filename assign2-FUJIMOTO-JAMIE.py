@@ -115,8 +115,8 @@ def SMO(X, y, C, kernel, eps):
             a[i] = ai_prime + (y[i] * y[j] * (aj_prime - a[j]))
         if np.linalg.norm(a - a_prev) <= eps:
             break
-        if count % 100 == 0:
-            print np.linalg.norm(a - a_prev)
+        # if count % 100 == 0:
+            # print np.linalg.norm(a - a_prev)
     return a
 
 
@@ -134,23 +134,24 @@ if __name__ == "__main__":
     indexes = [i for i in xrange(n) if a[i] > 0]
 
     ai = np.array([a[i] for i in indexes])  # Create ai vector
-    print "ai.shape: {0}".format(ai.shape)
+    # print "ai.shape: {0}".format(ai.shape)
     yi = np.array([y[i] for i in indexes])  # Create yi vector
-    print "yi.shape: {0}".format(yi.shape)
+    # print "yi.shape: {0}".format(yi.shape)
     Xi = np.array([X[i, :] for i in indexes])  # Create Xi matrix
-    print "Xi.shape: {0}".format(Xi.shape)
+    # print "Xi.shape: {0}".format(Xi.shape)
 
     aiyi = compute_ay(ai, yi)
-    print "aiyi.shape: {0}".format(aiyi.shape)
+    # print "aiyi.shape: {0}".format(aiyi.shape)
 
     # Compute bias
     bias = compute_bias(kernel, Xi, yi, ai)
-    print "bias: {0}".format(bias)
+    # print "bias: {0}".format(bias)
 
     # Compute w if linear kernel
+    weight = 0
     if kernel == "linear":
         weight = compute_weight(Xi, yi, ai)
-        print "weight: {0}".format(weight)
+        # print "weight: {0}".format(weight)
 
     # Make predictions on training set
     pred = predict(kernel, Xi, yi, ai, bias, X)
@@ -162,27 +163,33 @@ if __name__ == "__main__":
         if pred[i] == y[i]:
             count += 1
     accuracy = count / n
-    print "accuracy: {0}".format(accuracy)
-    #
-    # with open("assign2-FUJIMOTO-JAMIE.txt", "w") as f:
-    #     # Print support vector indexes
-    #     print "The support vectors are:"
-    #     f.write("The support vectors are:\n")
-    #     for i in indexes:
-    #         print i, a[i]
-    #         f.write("{0} {1}\n".format(i, a[i]))
-    #     print "Number of support vectors: {0}\n".format(len(indexes))
-    #     f.write("Number of support vectors: {0}\n".format(len(indexes)))
-    #
-    #     # Print bias
-    #     print "Bias:", bias
-    #     f.write("Bias: {0}\n".format(bias))
-    #
-    #     # Print w for linear kernel
-    #     if kernel == "linear":
-    #         print "w:", weight
-    #         f.write("w: {0}\n".format(weight))
-    #
-    #     # Print accuracy
-    #     print "Accuracy:", accuracy
-    #     f.write("Accuracy: {0}\n".format(accuracy))
+    # print "accuracy: {0}".format(accuracy)
+
+    with open("assign2-FUJIMOTO-JAMIE.txt", "w") as f:
+        # Print support vector indexes
+        print "The support vectors are:"
+        f.write("The support vectors are:\n")
+        for i in indexes:
+            print "{0} {1}".format(i, a[i])
+            f.write("{0} {1}\n".format(i, a[i]))
+        print "Number of support vectors: {0}\n".format(len(indexes))
+        f.write("Number of support vectors: {0}\n".format(len(indexes)))
+
+        # Print bias
+        print "Bias: {0}".format(bias)
+        f.write("Bias: {0}\n".format(bias))
+
+        # Print w for linear kernel
+        if kernel == "linear":
+            print "w: {0}".format(weight)
+            f.write("w: {0}\n".format(weight))
+
+        # Print accuracy
+        print "Accuracy: {0}".format(accuracy)
+        f.write("Accuracy: {0}\n".format(accuracy))
+
+        print "Used {0} kernel".format(kernel)
+        f.write("Used {0} kernel\n".format(kernel))
+
+        print "Used regularization constant: {0}".format(C)
+        f.write("Used regularization constant: {0}\n".format(C))
