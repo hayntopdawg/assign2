@@ -52,13 +52,20 @@ def compute_bias(kernel, X, y, a):
 
 
 def compute_weight(X, y, a):
+    """
+    Uses equation on page 530
+
+    Returns a d-dimensional vector
+    """
     ay = compute_ay(a, y)
     return np.dot(ay, X)
 
 
-def predict(a, indexes, kernel, X, y, b, z):
-    y_hat = sum([a[i] * y[i] * kernel_func(kernel, X[i], z) for i in indexes]) + b
-    return 1 if y_hat > 0 else -1
+def predict(kernel, X, y, a, b, z):
+    ay = compute_ay(a, y)
+    Kjz = kernel_func(kernel, X, z.T)
+    y_hat = np.dot(ay, Kjz) + b
+    return [1 if y_hat[i] > 0 else -1 for i in xrange(y_hat.shape[0])]
 
 
 def SMO(X, y, C, kernel, eps):
@@ -145,13 +152,17 @@ if __name__ == "__main__":
         weight = compute_weight(Xi, yi, ai)
         print "weight: {0}".format(weight)
 
-    # # Compute accuracy
-    # pred = [predict(a, indexes, kernel, X, y, bias, X[i]) for i in xrange(n)]
-    # count = 0
-    # for i in xrange(n):
-    #     if pred[i] == y[i]:
-    #         count += 1
-    # accuracy = count / n
+    # Make predictions on training set
+    pred = predict(kernel, Xi, yi, ai, bias, X)
+    # print "pred.shape: {0}".format(len(pred))
+
+    # Compute accuracy
+    count = 0
+    for i in xrange(n):
+        if pred[i] == y[i]:
+            count += 1
+    accuracy = count / n
+    print "accuracy: {0}".format(accuracy)
     #
     # with open("assign2-FUJIMOTO-JAMIE.txt", "w") as f:
     #     # Print support vector indexes
